@@ -68,6 +68,7 @@ class SelectableImage(QtWidgets.QLabel):
         super().__init__(parent=parent)
         self.start = (0, 0)
         self.end = (0, 0)
+        self.pressed = False
 
     def get_selection(self) -> Tuple[float, float, float, float]:
         x1, y1, x2, y2 = *self.start, *self.end
@@ -86,8 +87,14 @@ class SelectableImage(QtWidgets.QLabel):
 
     def mousePressEvent(self, ev: QtGui.QMouseEvent) -> None:
         self.start = self.end = self.get_rel_pos(ev)
+        self.pressed = True
+
+    def mouseMoveEvent(self, ev: QtGui.QMouseEvent) -> None:
+        self.end = self.get_rel_pos(ev)
+        self.repaint()
 
     def mouseReleaseEvent(self, ev: QtGui.QMouseEvent) -> None:
+        self.pressed = False
         self.end = self.get_rel_pos(ev)
         self.cropReadyEvent.emit(self.start != self.end)
         self.repaint()
